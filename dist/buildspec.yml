@@ -1,9 +1,21 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_REGION: "ap-south-1"
+    AWS_ACCOUNT_ID: "701703545554"
+    ECR_REPO_NAME: "brain-tasks-app"
+
 phases:
+  install:
+    commands:
+      - echo Installing kubectl...
+      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/2022-10-31/bin/linux/amd64/kubectl
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
+      - echo Logging into ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   build:
     commands:
@@ -12,11 +24,14 @@ phases:
       - docker tag $ECR_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
   post_build:
     commands:
-      - echo Pushing Docker image...
+      - echo Pushing image to ECR...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
-      - echo Build Completed
+      - echo Deploying to EKS...
+      - aws eks update-kubeconfig --region $AWS_REGION --name brain-tasks-cluster
+      - kubectl set image deployment/brain-tasks-app brain-tasks-app=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+      - kubectl rollout status deployment/brain-tasks-app
+
 artifacts:
   files:
-    - deployment.yaml
-    - service.yaml
+    - "**/*"
 
