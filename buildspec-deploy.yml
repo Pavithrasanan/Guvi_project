@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Setting up kubectl and awscli...
+  build:
+    commands:
+      - echo Deploying new image to EKS...
+      - bash deploy/deploy.sh
+  post_build:
+    commands:
+      - echo Deployment completed successfully.
+
