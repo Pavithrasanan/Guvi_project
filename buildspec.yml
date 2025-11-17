@@ -9,10 +9,12 @@ env:
 phases:
   install:
     commands:
-      - echo Installing kubectl...
-      - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.0/2023-11-09/bin/linux/amd64/kubectl"
+      # Install kubectl
+      - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.34.0/2024-07-22/bin/linux/amd64/kubectl"
       - chmod +x kubectl
-      - mv kubectl /usr/local/bin/
+      - mkdir -p ~/.local/bin
+      - mv kubectl ~/.local/bin/
+      - export PATH=$PATH:~/.local/bin
 
   pre_build:
     commands:
