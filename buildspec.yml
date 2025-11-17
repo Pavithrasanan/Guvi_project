@@ -10,9 +10,10 @@ phases:
   install:
     commands:
       - echo Installing kubectl...
-      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/2022-10-31/bin/linux/amd64/kubectl
+      - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.0/2023-11-09/bin/linux/amd64/kubectl"
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/
+
   pre_build:
     commands:
       - echo Logging into ECR...
